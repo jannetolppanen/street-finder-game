@@ -49,12 +49,41 @@ function DistrictFinder() {
     }
   }, []);
 
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    const d = R * c;
+    return d;
+  }, []);
+
+  const deg2rad = (deg) => {
+    return deg * (Math.PI/180);
+  };
+
+  // Function to select a random district - defined first to break circular dependency
+  const selectRandomDistrict = useCallback(() => {
+    const randomIndex = Math.floor(Math.random() * districtsData.features.length);
+    const district = districtsData.features[randomIndex];
+    setTargetDistrict(district);
+    setPlayerGuess(null);
+    setShowResult(false);
+    setTimeRemaining(30);
+  }, []);
+
+  // Define startTimer with selectRandomDistrict in its closure but not in dependencies
   const startTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          checkAnswer();
+          // Use a function reference instead of calling checkAnswer directly
+          if (timerRef.current) clearInterval(timerRef.current);
           return 0;
         }
         return prev - 1;
@@ -62,33 +91,15 @@ function DistrictFinder() {
     }, 1000);
   }, []);
 
+  // Create a ref to store the current selectRandomDistrict function
+  const selectRandomDistrictRef = useRef(selectRandomDistrict);
+  
+  // Keep the ref updated with the latest selectRandomDistrict function
   useEffect(() => {
-    if (gameState === 'playing') {
-      startTimer();
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [gameState, startTimer]);
+    selectRandomDistrictRef.current = selectRandomDistrict;
+  }, [selectRandomDistrict]);
 
-  const startGame = () => {
-    setGameState('playing');
-    setRound(1);
-    setScore(0);
-    selectRandomDistrict();
-    startTimer();
-  };
-
-  const selectRandomDistrict = () => {
-    const randomIndex = Math.floor(Math.random() * districtsData.features.length);
-    const district = districtsData.features[randomIndex];
-    setTargetDistrict(district);
-    setPlayerGuess(null);
-    setShowResult(false);
-    setTimeRemaining(30);
-  };
-
-  const checkAnswer = () => {
+  const checkAnswer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (playerGuess && targetDistrict) {
       const distance = calculateDistance(
@@ -104,30 +115,39 @@ function DistrictFinder() {
       setTimeout(() => {
         if (round < totalRounds) {
           setRound(prev => prev + 1);
-          selectRandomDistrict();
+          // Use the ref to get the latest selectRandomDistrict function
+          selectRandomDistrictRef.current();
           startTimer();
         } else {
           endGame();
         }
       }, 3000);
     }
-  };
+  }, [playerGuess, targetDistrict, timeRemaining, round, totalRounds, calculateDistance, startTimer]);
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2); 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const d = R * c;
-    return d;
-  };
+  // Update the timer effect to include checkAnswer as a dependency
+  useEffect(() => {
+    if (gameState === 'playing') {
+      startTimer();
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [gameState, startTimer]);
 
-  const deg2rad = (deg) => {
-    return deg * (Math.PI/180);
+  // Add an effect to check the answer when time is up
+  useEffect(() => {
+    if (timeRemaining === 0 && gameState === 'playing') {
+      checkAnswer();
+    }
+  }, [timeRemaining, gameState, checkAnswer]);
+
+  const startGame = () => {
+    setGameState('playing');
+    setRound(1);
+    setScore(0);
+    selectRandomDistrict();
+    startTimer();
   };
 
   const endGame = () => {
