@@ -27,7 +27,7 @@ function StreetFinder() {
   // Map states
   const [selectedCenter, setSelectedCenter] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState(1000); // Default 1km radius in meters
-  const [circleArea, setCircleArea] = useState(null);
+  // Removed unused circleArea state
   const [targetStreet, setTargetStreet] = useState(null);
   const [playerGuess, setPlayerGuess] = useState(null);
   const [streetList, setStreetList] = useState([]);
@@ -46,18 +46,14 @@ function StreetFinder() {
 
   // Handle map interactions
   const MapEventHandler = () => {
-    const map = useMapEvents({
+    useMapEvents({
       click: (e) => {
         if (gameState === 'setup') {
           // In setup mode, click sets the center of the search area
           setSelectedCenter(e.latlng);
           
           // Create a circle with the selected center and radius
-          const circle = L.circle(e.latlng, {
-            radius: selectedRadius
-          });
-          
-          setCircleArea(circle);
+          // We don't need to store the circle object since we use react-leaflet's Circle component
           
           // Fetch streets within the circular area
           fetchStreetsInCircle(e.latlng, selectedRadius);
@@ -76,7 +72,7 @@ function StreetFinder() {
     try {
       // Convert radius from meters to degrees (approximate)
       // 1 degree of latitude is approximately 111,000 meters
-      const radiusDegrees = radius / 111000;
+      // Removed unused radiusDegrees variable
       
       const query = `
         [out:json];
@@ -108,7 +104,6 @@ function StreetFinder() {
       console.error('Error fetching streets:', error);
       alert('Error fetching streets. Please try again.');
       setSelectedCenter(null);
-      setCircleArea(null);
     }
   };
 
@@ -306,10 +301,7 @@ function StreetFinder() {
                   
                   // Update circle if center is already selected
                   if (selectedCenter) {
-                    const circle = L.circle(selectedCenter, {
-                      radius: newRadius
-                    });
-                    setCircleArea(circle);
+                    // We don't need to create a Leaflet circle here as it's managed by the Circle component
                     
                     // Refetch streets with new radius
                     fetchStreetsInCircle(selectedCenter, newRadius);
