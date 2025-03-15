@@ -5,6 +5,31 @@
   padding: 20px;
 }
 
+/* Media query for larger screens */
+@media (min-width: 1400px) {
+  .street-finder {
+    max-width: 1400px;
+  }
+}
+
+/* Side-by-side layout for larger screens */
+@media (min-width: 992px) {
+  .game-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  
+  .game-controls {
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .map-container {
+    flex: 2;
+  }
+}
+
 h1 {
   text-align: center;
   color: #2c3e50;
