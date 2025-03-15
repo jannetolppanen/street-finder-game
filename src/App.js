@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.css';
+import HomePage from './HomePage';
 import StreetFinder from './StreetFinder';
+import DistrictFinder from './DistrictFinder';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -17,14 +19,14 @@ function App() {
               Street Finder Game
             </Typography>
             <Button color="inherit" component={Link} to="/">Home</Button>
-            <Button color="inherit" component={Link} to="/mode1">Mode 1</Button>
-            <Button color="inherit" component={Link} to="/mode2">Mode 2</Button>
+            <Button color="inherit" component={Link} to="/streets">Streets</Button>
+            <Button color="inherit" component={Link} to="/districts">Districts</Button>
           </Toolbar>
         </AppBar>
         <Routes>
-          <Route path="/" element={<StreetFinder />} />
-          <Route path="/mode1" element={<div>Mode 1</div>} />
-          <Route path="/mode2" element={<div>Mode 2</div>} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/streets" element={<StreetFinder />} />
+          <Route path="/districts" element={<DistrictFinder />} />
         </Routes>
       </div>
     </Router>
