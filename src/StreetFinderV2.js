@@ -1,6 +1,6 @@
 // Streets v2 placeholder page with hello world
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, useMapEvents, Circle, Marker, Popup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, useMapEvents, Marker, Popup, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import './StreetFinder.css';
