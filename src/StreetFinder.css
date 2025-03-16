@@ -1,33 +1,44 @@
 .street-finder {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
+  margin: 0;
   padding: 20px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Media query for larger screens */
 @media (min-width: 1400px) {
   .street-finder {
-    max-width: 1400px;
+    max-width: 100%;
   }
 }
 
 /* Side-by-side layout for larger screens */
-@media (min-width: 992px) {
-  .game-layout {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-  }
-  
-  .game-controls {
-    flex: 1;
-    max-width: 400px;
-  }
-  
-  .map-container {
-    flex: 2;
-  }
+.game-layout {
+  display: flex;
+  gap: 20px;
+  height: calc(100% - 60px); /* Account for header */
+  align-items: stretch;
+}
+
+.game-controls {
+  flex: 0 0 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.map-container {
+  flex: 1;
+  position: relative;
+  min-height: 400px;
+}
+
+/* Make sure the Leaflet map container takes full height */
+.leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
 }
 
 h1 {
@@ -95,12 +106,6 @@ button:hover {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-}
-
-.map-container {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .game-info {
